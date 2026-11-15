@@ -1,0 +1,13 @@
+[Unit]
+Description=Network connection audit nftables rules for agents
+After=firewalld.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=-/usr/bin/nft delete table inet agents_audit
+ExecStart=/usr/bin/nft -f /etc/nftables/agents-audit.nft
+ExecStop=/usr/bin/nft delete table inet agents_audit
+
+[Install]
+WantedBy=multi-user.target

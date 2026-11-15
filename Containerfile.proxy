@@ -1,0 +1,24 @@
+# Network-enabled proxy sidecar. NOT used as the agent execution image.
+FROM registry.fedoraproject.org/fedora:45
+RUN dnf -y install squid socat ca-certificates bash shadow-utils \
+    && groupadd -g 1000 proxyagent \
+    && useradd -u 1000 -g 1000 -m -s /bin/bash proxyagent \
+    && dnf clean all
+
+# Install proxy configuration
+COPY proxy/squid.conf /etc/squid/agent-sandbox.conf
+
+# Allow proxyagent to traverse the configuration directory
+# and read its configuration, without write permission.
+RUN chgrp proxyagent /etc/squid \
+    && chmod 0750 /etc/squid \
+    && chown root:proxyagent /etc/squid/agent-sandbox.conf \
+    && chmod 0640 /etc/squid/agent-sandbox.conf
+
+# Install the proxy launcher
+COPY proxy/start-proxy.sh /usr/local/bin/start-agent-proxy.sh
+RUN chmod 0555 /usr/local/bin/start-agent-proxy.sh
+
+
+USER proxyagent
+ENTRYPOINT ["/usr/local/bin/start-agent-proxy.sh"]

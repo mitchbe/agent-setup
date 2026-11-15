@@ -1,0 +1,10 @@
+/home/agents/control/logs/sandbox-@@NUMBER@@-proxy.log {
+    daily
+    size 10M
+    rotate 14
+    missingok
+    notifempty
+    compress
+    copytruncate
+    su root root
+}

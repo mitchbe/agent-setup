@@ -1,0 +1,18 @@
+[Unit]
+Description=Protected proxy log collector for agent sandbox @@NUMBER@@
+After=local-fs.target
+
+[Service]
+Type=simple
+User=agents
+Group=agents
+Environment=HOME=/home/agents
+ExecStart=/usr/local/libexec/agent-sandbox-proxy-log.sh @@NUMBER@@
+StandardOutput=append:/home/agents/control/logs/sandbox-@@NUMBER@@-proxy.log
+StandardError=journal
+UMask=0027
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

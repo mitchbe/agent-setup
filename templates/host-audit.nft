@@ -1,0 +1,8 @@
+# Host-level audit of new outbound connections by rootless agents UID 1888.
+# Works for ordinary host sockets and most rootless Podman pasta traffic.
+table inet agents_audit {
+    chain output {
+        type filter hook output priority 0; policy accept;
+        meta skuid 1888 ct state new counter log group 42 snaplen 96
+    }
+}

@@ -1,0 +1,18 @@
+# Codex CLI (OpenAI) runtime; all user configuration stored in /config/codex-rw.
+FROM registry.fedoraproject.org/fedora:45
+RUN dnf -y install bash ca-certificates curl git ripgrep nodejs npm shadow-utils socat \
+    && npm install --global @openai/codex \
+    && dnf clean all \
+    && npm cache clean --force
+RUN groupadd -g 1000 agent && useradd -u 1000 -g agent -m -s /bin/bash agent \
+    && mkdir -p /workspace/ro /workspace/rw /config/codex-rw \
+    && chown -R agent:agent /workspace /config
+ENV HOME=/config/codex-rw \
+    CODEX_HOME=/config/codex-rw/.codex \
+    XDG_CONFIG_HOME=/config/codex-rw/config \
+    XDG_CACHE_HOME=/config/codex-rw/cache \
+    XDG_DATA_HOME=/config/codex-rw/data \
+    XDG_STATE_HOME=/config/codex-rw/state
+USER agent
+WORKDIR /workspace/rw
+ENTRYPOINT ["codex"]

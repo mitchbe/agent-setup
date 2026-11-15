@@ -1,0 +1,64 @@
+# Claude Code sandbox image
+# Fedora 45, native Claude Code RPM
+
+FROM registry.fedoraproject.org/fedora:45
+
+# Basic runtime and development tools
+RUN dnf -y install \
+      bash \
+      ca-certificates \
+      curl \
+      git \
+      ripgrep \
+      gnupg2 \
+      shadow-utils \
+      socat \
+    && dnf clean all
+
+# Configure Anthropic's official stable RPM repository
+RUN printf '%s\n' \
+      '[claude-code]' \
+      'name=Claude Code' \
+      'baseurl=https://downloads.claude.ai/claude-code/rpm/stable' \
+      'enabled=1' \
+      'gpgcheck=1' \
+      'gpgkey=https://downloads.claude.ai/keys/claude-code.asc' \
+      > /etc/yum.repos.d/claude-code.repo
+
+# Verify Anthropic's signing key before importing it
+RUN curl -fsSL \
+      https://downloads.claude.ai/keys/claude-code.asc \
+      -o /tmp/claude-code.asc \
+    && test "$(gpg --show-keys --with-colons \
+      /tmp/claude-code.asc | awk -F: \
+      '$1 == "fpr" { print $10; exit }')" \
+      = "31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE" \
+    && rpm --import /tmp/claude-code.asc \
+    && dnf -y install claude-code \
+    && dnf clean all \
+    && rm /tmp/claude-code.asc
+
+# Create a non-root container account
+RUN groupadd -g 1000 claude \
+    && useradd -u 1000 -g claude \
+       -m -s /bin/bash claude \
+    && mkdir -p /workspace/ro /workspace/rw /config/claude-rw \
+    && chown claude:claude /workspace/ro /workspace/rw /config/claude-rw
+
+# Place all persistent user configuration under private config mount
+ENV HOME=/config/claude-rw \
+    CLAUDE_CONFIG_DIR=/config/claude-rw/.claude \
+    XDG_CONFIG_HOME=/config/claude-rw/config \
+    XDG_CACHE_HOME=/config/claude-rw/cache \
+    XDG_DATA_HOME=/config/claude-rw/data \
+    XDG_STATE_HOME=/config/claude-rw/state \
+    DISABLE_UPDATES=1
+
+# Run Claude without root privileges
+USER claude
+
+# Start inside the writable workspace
+WORKDIR /workspace/rw
+
+# Default command
+ENTRYPOINT ["claude"]

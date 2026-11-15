@@ -1,0 +1,10 @@
+/home/agents/control/logs/network.log {
+    daily
+    size 10M
+    rotate 14
+    missingok
+    notifempty
+    compress
+    copytruncate
+    su root root
+}

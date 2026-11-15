@@ -1,0 +1,16 @@
+[Unit]
+Description=Host-controlled outbound connection log for agents
+After=agents-audit.service
+Requires=agents-audit.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/tcpdump -i nflog:42 -nn -tttt -l -s 96
+StandardOutput=append:/home/agents/control/logs/network.log
+StandardError=journal
+UMask=0027
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
