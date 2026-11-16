@@ -23,7 +23,7 @@ if confirm; then
   install -d -m 0751 -o root -g root "$SANDBOX_DIR"
   install -d -m 2750 -o root -g "$AGENTS_USER" "$SANDBOX_DIR/ro"
   install -d -m 2770 -o "$AGENTS_USER" -g "$AGENTS_USER" "$SANDBOX_DIR/rw"
-  install -d -m 0700 -o "$AGENTS_USER" -g "$AGENTS_USER" "$SANDBOX_DIR/config" "$SANDBOX_DIR/config/claude-rw" "$SANDBOX_DIR/config/codex-rw" "$RUNTIME_DIR"
+  install -d -m 0700 -o "$AGENTS_USER" -g "$AGENTS_USER" "$SANDBOX_DIR/config" "$SANDBOX_DIR/config/claude-rw" "$SANDBOX_DIR/config/codex-rw" "$SANDBOX_DIR/config/codex-rw/.codex" "$RUNTIME_DIR"
   # Apply ACLs to the roots and establish sane defaults for new content.
   setfacl -m "g:${SHARE_GROUP}:rwx,m::rwx,o::---" "$SANDBOX_DIR/ro" "$SANDBOX_DIR/rw"
   setfacl -m "d:g:${AGENTS_USER}:r-x,d:g:${SHARE_GROUP}:rwx,d:m::rwx,d:o::---" "$SANDBOX_DIR/ro"

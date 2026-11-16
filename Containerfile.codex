@@ -1,6 +1,6 @@
 # Codex CLI (OpenAI) runtime; all user configuration stored in /config/codex-rw.
 FROM registry.fedoraproject.org/fedora:45
-RUN dnf -y install bash ca-certificates curl git ripgrep nodejs npm shadow-utils socat \
+RUN dnf -y install bash ca-certificates curl git ripgrep nodejs npm shadow-utils socat procps-ng \
     && npm install --global @openai/codex \
     && dnf clean all \
     && npm cache clean --force
